@@ -1,0 +1,230 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{mathtools}
+\usepackage[utf8]{inputenc}
+
+\renewcommand{\thesection}{S\arabic{section}}
+
+\makeatletter
+\renewcommand*{\@fnsymbol}[1]{\ensuremath{\ifcase#1\or 1\or \mbox{*}\or \dagger\or \ddagger\or
+    \mathsection\or \mathparagraph\or \|\or **\or \dagger\dagger
+    \or \ddagger\ddagger \else\@ctrerr\fi}}
+\makeatother
+
+
+\newcommand{\eagle}{\textsc{eagle}}
+\newcommand{\beginsupplement}{%
+    \setcounter{table}{0}
+    \renewcommand{\thetable}{S\arabic{table}}%
+    \setcounter{figure}{0}
+    \renewcommand{\thefigure}{S\arabic{figure}}%
+}
+
+\newcommand{\refsup}{\raisebox{2pt}{\scalebox{0.5}{\text{ref}}}}
+\newcommand{\SHone}{\mathcal{S}_{\text{H}_1(r)}}
+\newcommand{\sumHD}{\sum_{\substack{f \colon \\ \text{HD}(f,r^*) \leq 1}} \prod_{i=1}^{\ell_r} P[f_i|r_i]}
+\newcommand{\fSimR}{\substack{f \text{ similar} \\ \text{ to } r}}
+\DeclareMathAlphabet      {\mathbfit}{OML}{cmm}{b}{it}
+
+\date{}
+\title{EAGLE: Explicit Alternative Genome Likelihood Evaluator Supplemental Text}
+
+\author{Tony Kuo\thanks{Artificial Intelligence Research Center, AIST, Japan},
+Martin C. Frith\footnotemark[1],
+Jun Sese\footnotemark[1]
+~\& Paul Horton\footnotemark[1]~\thanks{Corresponding Author}}
+
+
+\begin{document}
+\maketitle
+
+\section{Mathematical Model}
+\subsection{Overview}
+We derive a probability distribution of the observed data (the sequencing reads) conditioned on an entire hypothetical genome (reference or alternative) and then describe a simple but effective way to use traditional read mapping to approximate the computation.  Our model is conceptually close to a previous model by Simola \& Kim~\cite{SK11}, but the details of our method and the mathematical exposition we present here differ substantially from their work.
+
+Throughout this paper we assume that sequencers do not make indel errors.  This is not essential to our theoretical approach, but simplifies the derivation and greatly reduces computation time.  The results we obtained suggest this assumption is tenable for the Illumina sequencing platform.
+
+\subsection{Basic Model}
+To describe our model, we start by deriving the likelihood of one sequencing read $r$ of length $\ell_r$, whose base-call quality scores define a probability distribution over some length $\ell_s$ DNA sequence $s$:
+%%
+\begin{equation}
+P[s|r] = \prod_{i=1}^{\ell_r} P[s_i|r_i].
+\end{equation}
+%%
+where $s_i$ is the $i$th base of $s$ and $r_i$ is the probability vector over \texttt{\{a,c,g,t\}} corresponding to the base and quality score of the $i$th position of $r$.  It is useful to reverse the direction of the conditional with Bayes' law producing:
+%%
+\begin{equation*}
+P[r|s] = \frac{P[r]}{P[s]} \prod_{i=1}^{\ell_r} P[s_i|r_i]
+\end{equation*}
+%%
+where $P[s]$ is the prior probability of a DNA sequence $s$ when we know only that $s$ was read by a sequencer.  For simplicity, we assume no indel errors so that the length of each read is the same as the length of the segment it derives from.  The sequencing technology and experimental protocol employed will determine the prior probability distribution of the length of reads (and equivalently the length of segments read) which we denote as $\mathcal{L}(\ell)$ (by definition $\sum_\ell \mathcal{L}(\ell) \equiv 1$).  Furthermore, we assume that the prior probability of equal length sequence segments are equal. Thus,
+%%
+\begin{equation*}
+P[s] =  \frac{\mathcal{L}(\ell_s)}{4^{\ell_s}}
+\end{equation*}
+%%
+where 4 is the alphabet size of possible nucleotides.  A similar type of distribution could be assumed for $P[r]$ using a larger alphabet size to include quality score information, but for our purposes it is more useful to leave $P[r]$ unspecified, as it will cancel later on when we look at probability ratios. Thus,
+%%
+\begin{equation*}
+P[r|s] = \frac{P[r]}{P[s]} \prod_{i=1}^{\ell_r} P[s_i|r_i]  =  \frac{P[r]4^{\ell_s}}{\mathcal{L}(\ell_s)} \prod_{i=1}^{\ell_s} P[s_i|r_i]
+\end{equation*}
+%%
+is the probability of a read given that we know it derives from a length $\ell_r$ DNA sequence $s$. But what if we only know that it derives from somewhere in genome $G$? Then,
+%%
+\begin{equation*}
+P[r|G] = \sum_{g\in G} P[g|G] P[r|g]
+\end{equation*}
+%%
+where $P[g|G]$ is the probability that genome sequence segment $g$ is sequenced, given we know only that some segment from $G$ is sequenced.  Although often unrealistic, we assume uniform priors on genome segments $g$ of any particular length (i.e.\ uniform coverage) and further assume that the length distribution of $g$ follows the general prior defined above as $\mathcal{L}(\ell)$.  Using $n_{\ell_g}$ to denote the number of genome segments of length $\ell_g$:
+%%
+\begin{equation*}
+P[g|G] = \mathcal{L}(\ell_g) \frac{1}{n_{\ell_g}}
+\end{equation*}
+%%
+and combining,
+%%
+\begin{equation*}
+\begin{split}
+P[r|G] =  \sum_{g\in G} P[g|G] P[r|g] &= \sum_{g\in G} \left( \mathcal{L}(\ell_g) \frac{1}{n_{\ell_g}} \right) \frac{P[r]4^{\ell_g}}{\mathcal{L}(\ell_g)} \prod_{i=1}^{\ell_g} P[g_i|r_i]  \\
+                                      &= \sum_{g\in G} \frac{P[r]4^{\ell_g}}{n_{\ell_g}} \prod_{i=1}^{\ell_g} P[g_i|r_i]  \\
+                                      &= \sum_{g\in G} \frac{P[r]}{n_{\ell_g}} \prod_{i=1}^{\ell_g} 4P[g_i|r_i]  \\
+                                      &\approx \frac{P[r]}{n} \sum_{g\in G} \prod_{i=1}^{\ell_g} 4P[g_i|r_i]  \\
+\end{split}
+\end{equation*}
+%%
+where the approximation in the last line reflects the fact that since chromosomes are typically much longer than reads, the number of genome segments $n_{\ell_g}$ can be well approximated as the genome length $n$.  Later, we will explicitly consider genome hypotheses of differing length, but as the length of these differences will be small compared to the genome length, we will still use $n$ to approximate the number of segments of any given length for all genome hypothesis.
+
+One important detail is that in practice some fraction $\xi$ (mnemonic for \emph{xenos}) of the reads will derive from sequences \emph{outside} of the reference sequence coordinates.  Such reads may derive from sequences unrelated to the human genome (e.g.\ contamination) or regions of the human genome not fully covered in the reference (e.g.\ telomere regions).  Later we will revisit how to model the outside source of reads, but first we proceed with a generic outside source which simply assumes that the reads from the outside follow the same distribution as the general prior $P[r]$.
+\begin{equation*}
+\begin{split}
+P[r|H]  &=  \;\; P[\text{from outside}] \, P[r|\text{from outside}]\\
+        &\;\; +  P[\text{from G}] \; P[r|\text{from G}]\\
+        & =  \xi P[r]  +  (1-\xi) \frac{P[r]}{n} \sum_{g\in G} \prod_{i=1}^{\ell_g} 4P[g_i|r_i]  \\
+\end{split}
+\end{equation*}
+To compute the probability of the entire set of reads we assume that each read is generated independently, an assumption which is not true considering biases introduced by PCR amplification and other steps of the sequencing process.  Nonetheless we make this assumption of read independence, to obtain:
+%%
+\begin{equation*}
+\begin{split}
+P[R|H] &=  \prod_{r\in R} \left(  \xi P[r]  +  (1-\xi) \frac{P[r]}{n} \sum_{g\in G} \prod_{i=1}^{\ell_g} 4P[g_i|r_i]  \right)  \\
+       &=  \prod_{r\in R} P[r] \left(  \xi  +  (1-\xi) \frac{1}{n} \sum_{g\in G} \prod_{i=1}^{\ell_g} 4P[g_i|r_i]   \right)
+\end{split}
+\end{equation*}
+%%
+Equivalently, by Bayes' law
+%%
+\begin{equation*}
+P[H|R] = \frac{P[H]}{P[R]} \prod_{r\in R} P[r] \left(  \xi  +  (1-\xi) \frac{1}{n} \sum_{g\in G} \prod_{i=1}^{\ell_g} 4P[g_i|r_i]   \right)
+\end{equation*}
+%%
+The ratio of the probability of two alternative hypotheses $H_v$ and $H_u$, assuming genome sequences $G_v$ and $G_u$ respectively is:
+%%
+\begin{equation*}
+\begin{split}
+\frac{P[H_v|R]}{P[H_u|R]} &= \frac{\frac{P[H_v]}{P[R]} \prod_{r\in R} P[r] \left(  \xi  +  (1-\xi) \frac{1}{n} \sum_{g\in G_v} \prod_{i=1}^{\ell_g} 4P[g_i|r_i]   \right)}
+                                  {\frac{P[H_u]}{P[R]} \prod_{r\in R} P[r] \left(  \xi  +  (1-\xi) \frac{1}{n} \sum_{g\in G_u} \prod_{i=1}^{\ell_g} 4P[g_i|r_i]   \right)}  \\
+                          &= \frac{P[H_v] \prod_{r\in R} \left(  \xi  +  (1-\xi) \frac{1}{n} \sum_{g\in G_v} \prod_{i=1}^{\ell_g} 4P[g_i|r_i]   \right)}
+                                  {P[H_u] \prod_{r\in R} \left(  \xi  +  (1-\xi) \frac{1}{n} \sum_{g\in G_u} \prod_{i=1}^{\ell_g} 4P[g_i|r_i]   \right)}
+\end{split}
+\end{equation*}
+%%
+This equation can be slightly cleaned up by defining convenience constants $x = n\xi$ and $h = 1-\xi$, yielding:
+%%
+\begin{equation*}
+\begin{split}
+\frac{P[H_v|R]}{P[H_u|R]} &=  \frac{P[H_v] \prod_{r\in R} \left(  \xi  +  (1-\xi) \frac{1}{n} \sum_{g\in G_v} \prod_{i=1}^{\ell_g} 4P[g_i|r_i]   \right)}
+                                   {P[H_u] \prod_{r\in R} \left(  \xi  +  (1-\xi) \frac{1}{n} \sum_{g\in G_u} \prod_{i=1}^{\ell_g} 4P[g_i|r_i]   \right)}  \\
+                          &=  \frac{P[H_v] \prod_{r\in R} \left(  \frac{x}{n}  +  h \frac{1}{n} \sum_{g\in G_v} \prod_{i=1}^{\ell_g} 4P[g_i|r_i]   \right)}
+                                   {P[H_u] \prod_{r\in R} \left(  \frac{x}{n}  +  h \frac{1}{n} \sum_{g\in G_u} \prod_{i=1}^{\ell_g} 4P[g_i|r_i]   \right)}  \\
+                          &=  \frac{P[H_v] \prod_{r\in R} \left(  x  +  h  \sum_{g\in G_v} \prod_{i=1}^{\ell_g} 4P[g_i|r_i]   \right)}
+                                   {P[H_u] \prod_{r\in R} \left(  x  +  h  \sum_{g\in G_u} \prod_{i=1}^{\ell_g} 4P[g_i|r_i]   \right)}
+\end{split}
+\end{equation*}
+%%
+where $G$ is treated as the multiset of all length $\ell$ segments of the hypothetical genome (including both chromosomes in each pair and for whole genome sequencing both strands, while for exome sequencing the targeted regions of the genome).
+
+As written, this computation iterates over each genome position {\em once for each read}, requiring an unrealistic amount of computation time.  Fortunately, we can overcome this problem.  First, we note that that the probability $P[r|g]$ will be negligible for the vast majority of genome segments $g$.  Only segments similar to the consensus sequence of $r$ will contribute significantly to the sum --- precisely the segments which read mapping software, used in multimap mode, are designed to find quickly.
+
+Some more notation is needed to explain our approximation precisely.  Consider the likelihood ratio of two genome hypothesis, e.g.\ the reference genome $G_u$ ($u$ mnemonic for unchanged) and a variant genome $G_v$ obtained by slightly editing $G_u$ in accordance to a candidate genome variant, say by deleting one base, at position $e$ of the reference genome.  Further let us denote the set of reads which cover position $e$ when mapped to the reference genome as $R^e$ and the set of genome segments to which read $r\in R^e$ maps to in the reference or variant genome as $G_u^r$ and $G_v^r$ respectively.  Importantly, although by definition the reads in $R^e$ all map covering position $e$ of the reference, in general they may map to multiple regions of the genome, and those regions may differ between different reads in $R^e$.  Finally we define the {\em neighborhood} $N_u^r$ ($N_v^r$) as the set of length $\ell_r$ genome segments overlapping any segment in $G_u^r$ or $G_v^r$ respectively.  By summing the likelihood over these neighborhoods instead of just a single segment, we cover the case in which the exact alignment of a read to the genome (i.e.\ gap placement) is ambiguous --- as is often the case for indel variants found in repetitive regions and/or occurring simultaneously with other nearby variants.  This summation is necessary because in the case of ambiguous local alignments more than one local length $\ell$ genome segment could generate read $r$ with non-negligible probability.
+
+Now we can express our approximation of the likelihood ratio as:
+\begin{equation*}
+\begin{split}
+\frac{P[H_v|R]}{P[H_u|R]} &=  \frac{P[H_v] \prod_{r\in R_e} \left(  x  +  h  \sum_{g\in N^r_v} \prod_{i=1}^{\ell_g} 4P[g_i|r_i]   \right)}
+                                   {P[H_u] \prod_{r\in R_e} \left(  x  +  h  \sum_{g\in N^r_u} \prod_{i=1}^{\ell_g} 4P[g_i|r_i]   \right)}
+\end{split}
+\end{equation*}
+Note that although we make an effort to treat the reference and variant genome hypothesis symmetrically, in the formulation as stated some asymmetry remains.  Namely, we define the read set $R^e$ relevant to a candidate variant in terms of which reads map near position $e$ in the reference genome.  Ideally, the set of reads considered would be the union of those which map near position $e$ in either the reference genome {\em or the variant genome}, which (especially in the case of longish indels) might not be the same as $R^e$.  Defining $R^e$ only in terms of the reference genome is a practical decision which eases program implementation --- all of the reads can be mapped to the reference genome in a precomputation step and those results used to quickly determine $R^e$ for each candidate variant (which number in the millions).  To remove this reference bias, one would need a way to quickly query the read set for reads similar to a genome segment overlapping the edited region of each variant genome hypothesis.  In principle a suffix array or similar type of index built from the reads could be used to do this, but we leave that for future work.  Nevertheless, although the set of reads considered potentially relevant to a given candidate variant is biased towards the reference genome, the rest of the computation is completely symmetric, explicitly handling genome segments unique to the alternative genome and the probability mass of each $r\in R^e$ derived from sites distant from $e$.
+
+\subsection{Outside Source Revisited}
+The generic outside source of reads described in our derivation above is inadequate for both technical and biological reasons.  In technical terms, the only reads for which a generic source may have a non-negligible posterior probability are reads which are dissimilar to any region of the hypothetical (reference or alternative) genome, i.e.\ unmappable reads, but in practice we ignore such reads.  If our implementation could be improved to perform read mapping to both hypotheses, the generic outside source could play a role in preventing the probability of the read in the hypothesis to which it does not map from becoming excessively small --- but in our current implementation we only map to the reference genome.  In terms of biology, there is a need to model paralogous sequences found in the individual genome but not in the reference genome; for example an individual might have an extra occurrence of the Alu repetitive element distinct from any of the numerous Alu elements included in the reference genome.  If the extra copy is a recent one, its sequence may be close enough to its paralogous brethren to allow for reads deriving from it to map to the reference genome.  Thus our method will see those reads, and potentially make incorrect inferences about candidate variants based on them if this clearly {\em non-generic} outside source of reads is not modeled effectively.
+
+\subsubsection{Outside Paralog Source}
+Here we describe a semi-theoretical model of an outside source of sequences paralogous to the human genome.  We admit up front that some of the assumptions will seem forced.  In fact, this model is reverse engineered from practice.  Nevertheless we feel it is useful to put what we are doing in an explicit theoretical framework in the hope that exposing the remaining issues will facilitate future improvement of the method and/or theory by ourselves or others.  Our generative model of outside paralogs assumes every genome segment $g$, potentially has an additional copy in the sequenced individual which is absent in the reference genome.  We use $F$ to denote the ``shadow'' of $G$ and $f^g$ to denote the doppelgänger paralog of $g$ in $F$ ({\tt f} is mnemonic for ``far'', cognate to ``para'', and {\tt F} is an alphabetic neighbor of {\tt G}).  Armed with that notation we seek to model the following:
+\begin{equation*}
+P[r|F] \; = \; \sum_{g\in G} \Big( \; P[g|F] \; \sum_f  P[f|g]\, P[r|f] \;\; \Big)
+\end{equation*}
+Where $P[g|F]$ is the probability that a read originating from the outside paralog source is derived from the doppelgänger copy of $g$.  $P[f|g]$ is the probability of a particular sequence $f$ given that it is an outside paralog derived from a copy of segment $g$ of the inside genome G, and $P[r|f]$ is the probability of a read given sequence $f$ (more generally written as $P[r|s]$).  Realistically modeling $P[g|F]$ would require consideration of the differing tendencies for various types of sequences to repeat frequently, for example known repetitive elements are much more likely to be repeated polymorphically than segments which occur uniquely in the reference genome.  However for simplicity we choose to assume a uniform distribution over the starting position of $g$ and the general prior distribution $\mathcal{L}(\ell_r)$ on the length of any read derived from a copy of $g$, so $P[g|F] = \frac{\mathcal{L}(\ell_r)}{n}$.  Turning to $P[f|g]$, a realistic model would require assumptions about the distribution of age and mutation rate of paralogs which we do not want to deal with.  Instead we start with the less ambitious observation that since by assumption $f$ is a paralogous copy of $g$, $f$ should be similar to $g$, and $P[f|g]$ should be negligible unless $f$ is similar to $g$.  The least informative probability distribution consistent with that assumption is to assign an equal probability to all sequences similar to $g$.  This begs the question of how {\em similar} is to be defined; which for practical reasons we define in a procedural way via mappability.  More precisely, we only consider the possibility that a read $r$ might come from the doppelgänger copy of $g$ if $r$ (multi)maps to $g$ when aligned to $G$.  This is roughly equivalent to viewing the mapping sensitivity threshold as a lower bound on the degree of dissimilarity for which $P[f|g]$ becomes small enough to ignore.
+\begin{equation*}
+\begin{split}
+P[r|F] &= \;\;\; \sum_{g\in G} \Big( \; P[g|F] \;\; \sum_f  P[f|g]\, P[r|f] \;\; \Big)\\
+       &\approx \hspace*{-4mm} \sum_{g \colon r \text{ maps to }g} \hspace*{-5mm} \Big( \; P[g|F] \; \sum_{\fSimR} \frac{1}{\nu_{\ell_r}} \, P[r|f] \;\; \Big)\\
+       &= \hspace*{-4mm} \sum_{g \colon r \text{ maps to }g} \hspace*{-5mm} \Big( \; \frac{\mathcal{L}(\ell_r)}{n} \; \sum_{\fSimR} \frac{1}{\nu_{\ell_r}} \;\; P[r|f] \;\; \Big)\\
+       &= \; \frac{m_r}{n\nu_{\ell_r}} \; \sum_{\fSimR} \mathcal{L}(\ell_r) \, P[r|f]\\
+\end{split}
+\end{equation*}
+Where $m_r$ is the number of segments in $G$ to which $r$ maps; and $\nu_{\ell_r}$ is the size of the set \mbox{``$f$ similar to $r$''}, subscripted with $\ell_r$ to indicate that the size of this set grows with $\ell_r$.  The set \mbox{``$f$ similar to $r$''} is not precisely defined, but could be considered to be implicitly defined by the condition that $g$ and $r$ are similar enough that $r$ is mappable to $g$.  This follows from the assumption that $r$ is a read obtained by sequencing $f$ (a paralog of $g$).  In any case, in practice we replace the set \mbox{``$f$ similar to $r$''} with a precisely defined one in an approximation given below.
+
+As before we define the prior probability of a DNA sequence, given only that we know it was sequenced to produce some read $r$, as $P[f] = \frac{\mathcal{L}(\ell_r)}{4^{\ell_r}}$; and apply Bayes' law to obtain a formula in which quality scores can be used, obtaining:
+\begin{equation*}
+\begin{split}
+\sum_f \mathcal{L}(\ell_r) P[r|f] &= \;\;\; \sum_{\fSimR} \mathcal{L}(\ell_r) \frac{P[r]P[f|r]}{P[f]} \\
+                                 &= P[r] \sum_{\fSimR} \mathcal{L}(\ell_r) \frac{\prod_{i=1}^{\ell_r} P[f_i|r_i]}{\frac{\mathcal{L}(\ell_r)}{4^{\ell_r}}} \\
+                                 &= P[r] \sum_{\fSimR} \; \prod_{i=1}^{\ell_r} 4P[f_i|r_i]
+\end{split}
+\end{equation*}
+Now we make another approximation.
+\begin{equation*}
+\begin{split}
+\sum_{\fSimR} \; \prod_{i=1}^{\ell_r} P[f_i|r_i] \;\; &\approx \;\; a \hspace*{-6mm} \sumHD\\
+&\coloneqq a \, \SHone \hspace*{1cm} \text{(defined for subsequent notational convenience)}
+\end{split}
+\end{equation*}
+Where $r^*$ is the sequence called by the read (i.e.\ the sequence given by the read assuming no errors), $\text{HD}(f,r^*)$ denotes the Hamming distance between $f$ and $r^*$, and $a$ is a proportionality constant.  In other words the assumption is that summing over sequences with zero or one mismatches relative to the read is an acceptable approximation to summing over all sequences similar to $r$.  Note that although not completely obvious from the formula above, $\SHone$ can be computed in time proportional to $\ell_r$ by taking advantage of the fact that changing one character in $f$ only changes one term in $\sum[f_i|r_i]$.  Although motivated by computation cost, the approximation may be a reasonably good one in practice.  For example consider a read of length 100 with all quality scores corresponding to a 1\% error rate.  The probability the read $r$ was sequenced from its consensus sequence would be $0.99^{100} \approx 0.366$, while the probability it was sequenced from one with exactly one substitution would be $100*0.01*0.99^{99} = 0.99^{98} \approx 0.370$.  So in this case, the Hamming distance $\leq 1$ set of sequences together account for over 73\% of the probability mass.  In the hope of slightly improving the approximation we multiply by a constant $a \geq 1$, making the somewhat weaker assumption that the sum over the strings within Hamming distance one will be approximately {\em proportional} (as opposed to equal) to the full probability.
+
+We can now replace the generic outside source of reads defined in the previous section to obtain:
+\begin{equation*}
+\begin{split}
+P[r|H]  &=  \;\; P[\text{from outside}] \, P[r|\text{from outside}]\\
+        &\;\; +  P[\text{from G}] \; P[r|\text{from G}]\\
+        & =  \xi P[r] m_r \frac{a}{n\nu_{\ell_r}} \,4^{\ell_g}\, \SHone  +  (1-\xi) \frac{P[r]}{n} \sum_{g\in G} \prod_{i=1}^{\ell_g} 4P[g_i|r_i]  \\
+\end{split}
+\end{equation*}
+Assuming the reads are generated independently:
+\begin{equation*}
+\begin{split}
+P[R|H] &=  \prod_{r\in R} \left(  \xi P[r] m_r \frac{a}{n\nu_{\ell_r}} \,4^{\ell_g}\, \SHone   +  (1-\xi) \frac{P[r]}{n} \sum_{g\in G} \prod_{i=1}^{\ell_r} 4P[g_i|r_i]  \right)  \\
+       &=  \frac{1}{n} \prod_{r\in R} P[r] \left(  \xi  m_r \frac{a}{\nu_{\ell_r}} \,4^{\ell_g}\, \SHone   +  (1-\xi) \sum_{g\in G} \prod_{i=1}^{\ell_r} 4P[g_i|r_i]  \right)
+\end{split}
+\end{equation*}
+Applying Bayes' law,
+\begin{equation*}
+\begin{split}
+\frac{P[H_v|R]}{P[H_u|R]} &= \frac{P[H_v]}{P[H_u]} \frac{\prod_{r\in R} \left( \xi  m_r \frac{a}{\nu_{\ell_r}} \,4^{\ell_g}\, \SHone  +  (1-\xi) \sum_{g\in G_v} \prod_{i=1}^{\ell_r} 4P[g_i|r_i]  \right)}{\prod_{r\in R} \left(  \xi  m_r \frac{a}{\nu_{\ell_r}} \,4^{\ell_g}\, \SHone  +  (1-\xi) \sum_{g\in G_u} \prod_{i=1}^{\ell_r} 4P[g_i|r_i] \right)} \\
+&= \frac{P[H_v]}{P[H_u]} \frac{\prod_{r\in R} \left( \xi  m_r \frac{a}{\nu_{\ell_r}}\, \SHone  +  (1-\xi) \sum_{g\in G_v} \prod_{i=1}^{\ell_r} P[g_i|r_i]  \right)}{\prod_{r\in R} \left(  \xi  m_r \frac{a}{\nu_{\ell_r}} \, \SHone  +  (1-\xi) \sum_{g\in G_u} \prod_{i=1}^{\ell_r} P[g_i|r_i] \right)} \\
+                   &\approx \frac{P[H_v]}{P[H_u]} \frac{\prod_{r\in R} \left( \xi  m_r \frac{a}{\nu_{\ell_r}} \, \SHone  +  (1-\xi) \sum_{g\in N^r_v} \prod_{i=1}^{\ell_r} P[g_i|r_i]  \right)}{\prod_{r\in R} \left( \xi  m_r \frac{a}{\nu_{\ell_r}} \, \SHone  +  (1-\xi) \sum_{g\in N^r_u} \prod_{i=1}^{\ell_r} P[g_i|r_i] \right)} \\
+                   &= \frac{P[H_v]}{P[H_u]} \frac{\prod_{r\in R} \left( \frac{\xi}{1-\xi} m_r \frac{a}{\nu_{\ell_r}} \, \SHone  +  \frac{1-\xi}{1-\xi} \sum_{g\in N^r_v} \prod_{i=1}^{\ell_r} P[g_i|r_i]  \right)}{\prod_{r\in R} \left( \frac{\xi}{1-\xi} m_r \frac{a}{\nu_{\ell_r}} \, \SHone  +  \frac{1-\xi}{1-\xi} \sum_{g\in N^r_u} \prod_{i=1}^{\ell_r} P[g_i|r_i] \right)} \\
+                   &= \frac{P[H_v]}{P[H_u]} \frac{\prod_{r\in R} \left( m_r h \, \SHone  +  \sum_{g\in N^r_v} \prod_{i=1}^{\ell_r} P[g_i|r_i]  \right)}{\prod_{r\in R} \left( m_r h \, \SHone  +  \sum_{g\in N^r_u} \prod_{i=1}^{\ell_r} P[g_i|r_i] \right)} \\
+\end{split}
+\end{equation*}
+Where in the last line, the convenience constant $h$ is redefined as $h = \frac{\xi a}{(1-\xi)\nu_{\ell_r}}$.  In practice $h$ is a tunable parameter of Eagle and it is not necessary to decompose it into its constituent components $\xi$, $\nu_{\ell_r}$ and $a$.  The theory described above suggests that the value of $h$ should decrease with the read length of $r$, but currently Eagle uses the same value of $h$ for all reads.
+
+{\bf Down-weighting multi-mapped reads:}  We note in passing that with the paralog outside source model, multi-mapped reads which potentially support a candidate variant are weighted down in two ways.  First, before even looking at the details of the read, the simple fact that it maps to so many places {\em inside} the reference genome, suggests it may be more likely to also map {\em outside} the reference genome if those extra sequences were available; an effect modeled by the $m_r$ term.  Second, even if we assume the read comes from the inside, its probability mass will be distributed among the multiple sites it maps to in accordance with the details (sequence and quality scores) of the read.
+
+\end{document}
