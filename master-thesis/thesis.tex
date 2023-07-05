@@ -173,7 +173,7 @@ Here, an example illustrating how to calculate the relative entropy from methyla
 
 In summary, MethylSeqLogo provides a powerful and intuitive visualization tool for studying the functional role of DNA methylation in gene regulation. It is a valuable tool for researchers in the field of epigenetics and genomics, aiding in the identification of potential regulatory regions, examining the impact of DNA methylation on transcription factor binding, and gaining deeper insights into the complex gene regulatory processes occurring within cells.
 
-\section{pybedtools}
+\section{Pybedtools}
 pybedtools~\cite{10.1093/bioinformatics/btr539} is a powerful Python library used for manipulating and analyzing genomic interval data. It serves as an interface to the BEDTools~\cite{10.1093/bioinformatics/btq033} suite, offering a wide range of functions to handle genomic intervals, including operations such as intersection, merging, and complementation between genomes. By leveraging the underlying BEDTools tools, pybedtools optimizes performance and memory usage, making it well-suited for efficient processing of large-scale genomic data. It supports various file formats, such as BED, BAM, VCF, and GTF, enabling easy reading and writing of data in different formats. Additionally, it provides advanced features like computing overlaps, calculating coverage statistics, and performing set operations. One significant advantage is its seamless integration with popular libraries like pandas and numpy, facilitating data analysis and calculations. Hence, pybedtools was chosen as a valuable tool for studying transcription factor binding sites in this research. Overall, pybedtools is a versatile and efficient tool for working with genomic interval data, offering an intuitive interface, extensive functionality, and integration with other Python libraries. The functions utilized in this study include "intersect" and "getfasta".
 \begin{figure}[H]
 	\centering
@@ -199,7 +199,7 @@ If we are interested in identifying transcription factor binding sites in differ
 \begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.5]{figures/schema_data_remap2020_2.png}
-	\caption{schema data of ReMap(Figure is from~\cite{ReMapFayrouz2022},without changes)}
+	\caption{Schema data of ReMap(Figure is from~\cite{ReMapFayrouz2022},without changes)}
 	\label{fig:remap} % \ref{this label}
 \end{figure}
 
@@ -240,7 +240,7 @@ Pipeline overview shown in \ref{fig:overview},The user is required to input file
 	\label{fig:overview} % \ref{this label}
 \end{figure}
 
-\section[automatic computational workflow]{Detail workflow of automatic computational pipeline}
+\section[Automatic Computational Workflow]{Detail workflow of automatic computational pipeline}
 \subsection[Finding TFBSs]{Identifying the binding site information of TF in cell.}
 In this step, two input files are required. The first file contains the regions obtained from the Chip-seq experiment, which potentially contain the binding sites of MYC in human embryonic stem cells. These regions are represented as approximate genomic coordinates and typically have a range of 200-500 base pairs. This data can be obtained from ReMap, and the specific file I used is "ENCSR000EBY.MYC.WA01.bed". The second file can be obtained from JASPAR and contains the precise binding site coordinates of the MYC transcription factor across various cells or tissues. The file I used is "MA0147.3.bed". Both files obtained from ReMap and JASPAR are in the .bed file format. We can then intersect the genomic coordinates from these two files to find the binding site information of MYC in human embryonic stem cells(H1-hESC). In the automated computational pipeline, this study used the "intersect" function provided by the pybedtools library in BEDTools to perform this operation.A total of 2088 transcription factor binding sites of MYC were found.
 It is important to note that both files must be mapped to the same human reference genome. Genomic coordinates generated based on different human reference genomes can vary significantly. The commonly used human reference genomes are hg19 and hg38, with hg38 being more prevalent. This is because hg38 has improved genome coverage compared to hg19, resulting in more accurate positioning and annotation of gene sequences. Furthermore, some structural errors in chromosomes have been corrected in hg38. Fortunately, we can quickly convert the genomic coordinates between hg19 and hg38 using the "Lift Genome Annotations" website provided by UCSC.
@@ -414,16 +414,17 @@ CEBPB is a transcription factor belonging to the C/EBP (CCAAT/enhancer-binding p
 \section{Discussion}
 \subsection{JASPAR version affects Sequence Logo Track of MethylSeqLogo}
 In this study, the input data utilized a BED file containing specific binding site coordinates of transcription factors in all cells or tissues, which was curated by JASPAR. For each included transcription factor, JASPAR always provides a position weight matrix (PWM) but may not necessarily offer a corresponding BED file. Additionally, there may be multiple versions of the data (as detailed in the section 2.3.1), so special attention is required. In the case of the CEBPB transcription factor, this study encountered different versions of the data. The current version available is the 3rd version, which only provides a PWM matrix. The BED file, on the other hand, is only available in version 1. However, the data in versions 1 and 3 differ significantly(shown in Figure~\ref{fig:CEBPBv1v3}), leading to different results in the sequence logo analysis. In a research report, it was shown that the preferred binding sites of the CEBPB transcription factor is ATTGCGCAAT~\cite{johnson1993identification}. Figure~\ref{fig:CEBPBFlanking} presents the results obtained using version 1 (Figure~\ref{fig:CEBPBv1}) of the BED file. The common bases at positions 7 and 8 in motifs on the figure differ from the research findings of~\cite{johnson1993identification}. At first glance, this might lead us to believe that there is an error in the computational pipeline established in this study. However, upon observing the Sequence logo provided by JASPAR in version 3, it becomes evident that the disparities arise from differences in the content of the JASPAR versions. Details like these are worth paying close attention to.
-\begin{figure}[H]
+\begin{figure}[htbp]
 	\centering
 	\begin{subfigure}[b]{0.45\textwidth}
 		\includegraphics[width=\textwidth]{figures/v1.png}
-		\caption{version 1}
+		\caption{Version 1}
 		\label{fig:CEBPBv1} 
 	\end{subfigure}
 	\begin{subfigure}[b]{0.45\textwidth}
+		\ContinuedFloat
 		\includegraphics[width=\textwidth]{figures/v3.png}
-		\caption{version 3}
+		\caption{Version 3}
 	\end{subfigure}
 	\caption{Sequence logo of different versions of CEBPB in JASPAR (without no change)}
 	\label{fig:CEBPBv1v3} 
@@ -432,17 +433,21 @@ In this study, the input data utilized a BED file containing specific binding si
 In Figure~\ref{fig:CEBPBFlanking}, we used the flanking region background model to illustrate the high methylation status of the binding sites of the CEBPB transcription factor in human embryonic stem cells. Now, we have switched to using the whole-genome and promotor region as the background model for statistical distribution calculations. The results, as shown in Figure~\ref{fig:CEBPBWhole-genome} and Figure~\ref{fig:CEBPBpromotor}, reveal that the visualization of high methylation status under the whole-genome background model is not as prominent as when using the flanking region background model. Interestingly, under the promoter region background model, low methylation is shown. Therefore, choosing an appropriate background model is crucial depending on the purpose of our observation. In this case of examining the high methylation status of CEBPB binding sites in human embryonic stem cells, the flanking region would be a preferable choice.
 \begin{figure}[H]
 	\centering
-	\begin{subfigure}[b]{0.85\textwidth}
+	\begin{subfigure}[b]{0.9\textwidth}
 		\includegraphics[width=\textwidth]{figures/yulingCEBPB_human_H1-hESC_whole_genome_Methyl_Kullback-Liebler_seqlogo.png}
-		\caption{Whole-genome}
+		\caption{Whole genome}
 		\label{fig:CEBPBWhole-genome} 
 	\end{subfigure}
-	\begin{subfigure}[b]{0.85\textwidth}
+	\begin{subfigure}[b]{0.9\textwidth}
 		\includegraphics[width=\textwidth]{figures/CEBPBPROMOTOR.png}
-		\caption{Promotor region}
+		\caption{Promoter region}
 		\label{fig:CEBPBpromotor} 
 	\end{subfigure}
-	\begin{subfigure}[b]{0.85\textwidth}
+\end{figure}
+	
+\begin{figure}[H]
+	\ContinuedFloat
+	\begin{subfigure}[T]{0.9\textwidth}
 		\includegraphics[width=\textwidth]{figures/yulingCEBPB_human_H1-hESC_1000_Methyl_Kullback-Liebler_seqlogo.png}
 		\caption{Flanking region}
 		\label{fig:CEBPBFlanking region} 
@@ -452,6 +457,7 @@ In Figure~\ref{fig:CEBPBFlanking}, we used the flanking region background model 
 \end{figure}
 \subsection{More efficient}
 Lastly, I would like to discuss the establishment of an automated computational pipeline in this study. The design of automation not only brings convenience but, more importantly, allows for the rapid generation of results. Prior to the implementation of the automated computational pipeline, it was estimated that it would take approximately 3-4 hours to obtain a single MethylSeqLogo depicting the binding of MYC to human embryonic stem cells using the whole-genome background model. However, with the implementation of the automated computational pipeline, this study can now generate approximately 10 MethylSeqLogos depicting the binding of various transcription factors to human embryonic stem cells in the whole-genome background model within the same timeframe.
+\clearpage
 \begin{figure}[H]
 	\centering
 	\begin{subfigure}[b]{0.9\textwidth}
