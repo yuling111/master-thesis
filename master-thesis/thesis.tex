@@ -11,7 +11,7 @@
 \usepackage{multirow}
 \addbibresource{thesis.bib}
 
-\newcommand*\Department中文{資訊工程學研究所}
+\newcommand*\Department中文{醫學資訊研究所}
 \newcommand*\Department英文{Institute of Medical Informatics}
 
 \newcommand*\ThesisTitle中文{可視化轉錄因子結合位點與甲基化資訊之實現}
@@ -32,7 +32,7 @@
 %% \newcommand*\CoAdvisorB英文{}
 
 \newcommand*\YearMonth英文{July, 2023}
-\newcommand*\YearMonth中文{122年7月}
+\newcommand*\YearMonth中文{112年7月}
 
 \hyphenpenalty=1024
 
@@ -41,13 +41,53 @@
 
 
 \newcommand*\Keywords英文{MethylSeqLogo, Transcription Factor, DNA methylation}
-\newcommand*\Abstract英文{MethylSeqLogo, a type of sequence logo that encompasses DNA methylation information, was introduced by scholars Fei-Man and Paul last year. The purpose of this visualization is to quantify the functionality of transcription factors and the state of gene regulation within cells based on transcription factor binding sites. However, MethylSeqLogo does not allow researchers to input their own experimental raw data for generating sequence logos. Therefore, the goal of my research is to establish an automated computational pipeline for MethylSeqLogo. Additionally, this study proposes a new option for the background model called "Flanking Region," which ensures that statistical differences are attributed to the binding sites themselves or adjacent nucleotides. The experimental results of this study, presented in visualized charts, are consistent with previous research reports from multiple scholars, confirming the accuracy of the automated pipeline and the accelerated generation of results. The establishment of this automated computational pipeline through my research enables researchers to conveniently, efficiently, and clearly observe gene regulation within cells. It can be utilized for academic research, related analysis, and communication, and even for disease prevention and treatment.}
+\newcommand*\Abstract英文{
+%Background
+Both transcription factor (TF) binding and DNA Methylation on or near genes are known to play important roles in gene regulation.
+Recently Hsu \& Horton developed MethylSeqLogo, as a "methylation smart" extension to sequence logos
+which simultaneously show the DNA sequence and methylation patterns of a collection of TF binding sites
+(vis-à-vis some background distribution).
+
+Their MethylSeqLogo design appears useful to but their work has two limitations.
+The first limitation is that they did not fully automate the process of producing MethylSeqLogo images from primary data.
+This is problematic because both TF binding and DNA methylation are tissue specific, so every user
+potentially is interested in seeing a different MethylSeqLogo image.
+Hsu \& Horton do provide open source software to produce MethylSeqLogo images, but require the user to provide the information
+TF binding site sequence and methylation information shown in the images.
+Unfortunately, several steps are needed to extract that information from the standard
+primary or secondary data files widely available from the relevant experiments (CHiP Seq for TF binding and
+BiSulfite sequencing for DNA methylation).  The second limitation is they provide only two background distributions
+(whole genome and a set of promoter regions) against which to compared the DNA methylation level of TF binding sites,
+but the binding site distribution of some TFs may not fit either of those background models well.
+
+%GOAL and Method
+This work describes our development of original software to support and extend MethylSeqLogo.
+We 1) create an automated pipeline to automate the production of MethylSeqLogo's from
+experimental data in standard data file formats, and 2) extend the MethylSeqLogo software to support
+TF specific background models based on the regions flanking their binding sites.
+
+%Results and discussion
+After describing our implementation we show several MethylSeqLogo images generated using our pipeline.
+We confirm that those MethylSeqLogo images are consistent with the images published by Hsu \& Horton
+when using the same (whole genome) background model.  Furthermore we contrast the MethylSeqLogo images
+produced with a flanking region background model versus their promoter region background.  We find that
+in some cases for which the promoter background model seems to indicate an important role for DNA methylation,
+much of the apparent correlation between DNA methylation and binding disappears when
+using the flanking region background model.  This observation underscores the need for using a suitable
+background when interpreting statistical trends in data.}
 
 
 
 \newcommand*\Keywords中文{甲基化序列標誌、轉錄因子、DNA 甲基化}
 \newcommand*\Abstract中文{
-MethylSeqLogo是一種涵蓋DNA甲基化資訊的序列標誌，由Fei-Man和Paul2位學者在去年提出來，像這樣的可視化圖表呈現，用意是讓我們可以透過轉錄因子結合位來量化轉錄因子在細胞內的功能以及基因調控的情形，然而MethylSeqLogo無法讓研究人員輸入自己實驗後的結果檔案來產生序列標誌，因此我研究的目標就是要為MethylSeqLogo建構一個自動化的計算管道，另外本研究也為背景模型提出了一個新的選項，命名為“Flanking 區域”，如此一來可以確保統計差異是歸因於結合位點本身或側翼區鹼基。本研究的實驗結果(視覺化圖表呈現)皆與多位學者提出之研究報告結果皆一致相符，說明自動化計算管道建立的方法是正確的且自動化也加速了結果的產生。透過本研究建立的自動化的計算管道能更讓研究者方便且更有效率和清楚的觀察細胞內的基因調控情況，進而用於學術研究的相關分析與交流，甚至是做疾病的預防或是治療。
+%	背景：
+	轉錄因子（TF）結合和基因附近的DNA甲基化在基因調控中扮演重要角色。Hsu和Horton在近期開發了MethylSeqLogo，作為序列標誌的「甲基化智能」擴展，它可以同時顯示一組轉錄因子結合位點的DNA序列和甲基化訊息（相對於某種背景分佈）。然而，他們的MethylSeqLogo設計有兩個限制。第一個限制是他們沒有完全自動化從原始數據生成MethylSeqLogo圖像的過程。這是一個大問題，因為TF結合和DNA甲基化是組織特異性的，所以每個使用者可能對不同的MethylSeqLogo圖像感興趣。Hsu和Horton提供了開源軟體來生成MethylSeqLogo圖像，但要求使用者提供在圖像中顯示的轉錄因子結合位點序列和甲基化訊息。不幸的是，從相關實驗的標準原始或次要數據文件中提取這些訊息需要幾個步驟（轉錄因子結合位的CHiP Seq和DNA甲基化的亞硫酸测序）。第二個限制是他們只提供了兩個背景分佈（whole genome 和 一組 promoter regions）來比較轉錄因子結合位點的DNA甲基化水平，但某些TF的結合位點分佈可能與這兩個背景模型都不匹配。
+	
+%	目標和方法：
+	本研究描述了我們開發的原始軟體，以支持和擴展MethylSeqLogo。我們的目標是：1）創建一個自動化的計算管道，從標準數據文件格式(BED file)中自動生成MethylSeqLogo圖像的實驗數據；2）擴展MethylSeqLogo軟體，支持基於與TF結合位點相鄰的區域的TF特定背景模型(flanking region)。
+	
+%	結果和討論：
+	在描述我們的方法的實做之後，我們展示了使用我們的管道生成的幾個MethylSeqLogo圖像。當使用相同的（全基因組）背景模型時，我們確認這些MethylSeqLogo圖像與Hsu和Horton發布的圖像一致。此外，我們對比了使用與啟動子區域背景(promoter region)相比的相鄰區域(flanking region)背景模型生成的MethylSeqLogo圖像。我們發現在某些情況下，使用啟動子背景模型(promoter region)似乎表明DNA甲基化起著重要作用時，當使用相鄰區域背景模型(flanking region)時，DNA甲基化與結合之間的大部分相關性消失。這個觀察強調了在解釋數據中的統計趨勢時使用適當背景的必要性。
 }
 
 \newcommand*\Acknowledgements{%
@@ -90,26 +130,31 @@ MethylSeqLogo是一種涵蓋DNA甲基化資訊的序列標誌，由Fei-Man和Pau
 \section{Background}
 During the process of biological growth, which includes cell growth, development, differentiation, apoptosis, and death, meticulous orchestration is required. It is akin to a production line where each step and pipeline of manufacturing and production influences the quality of the final product. Transcription factors (TFs) play a crucial role as key players in the growth of living organisms. TFs are proteins that regulate gene transcription, and upon interaction with DNA, they can control cellular logic by inhibiting or activating gene expression. This is why, despite all cells utilizing the same set of genes, there can be a wide variety of cell types (e.g., muscle cells, skin cells) with distinct functions. This diversity arises because only specific gene can be recognized and transcribed by TFs in different organs and tissues~\cite{lambert2018human}.
 
-DNA methylation refers to the addition of a methyl group to the fifth carbon atom of cytosine, resulting in the formation of methyl cytosine (meC). It is often classified as the fifth DNA base~\cite{Listerfifthbase2009}~\cite{Vinermethylsensitive2016} and is known to cause gene silencing and the abnormal functioning of genes, leading to inhibitory effects~\cite{Jones2012DNAmethylationislands}. DNA methylation is an epigenetic modification that can alter cellular gene function without changing the DNA sequence. Its effects can be inherited by the next generation. Numerous studies have shown a strong association between DNA methylation and cancer~\cite{KeithDNAmethyl2005}~\cite{Feinberg1983Hypomethylation}.\\
-\indent A dinucleotide sequence may be considered too short and lack biological interest. However, CpG dinucleotides are an exception. In most vertebrate genomes, CpG dinucleotides are generally rare, occurring at a frequency of approximately one-fifth~\cite{Saxonov2006}. This is because they are prone to methylation by DNA methyltransferases. However, the situation is different in promoter regions. In many promoter regions, there is often a high density of consecutive CpG dinucleotides, forming gene sequences known as CpG islands. CpG islands are characterized by a relatively low or nearly absent level of methylation compared to the rest of the genome. This implies that genes within these regions are typically active and capable of transcription~\cite{Deaton2011CpG}.\\
-\indent Given that transcription is a complex and crucial process, it is of great importance to enable researchers to analyze and compare data efficiently and clearly. One early successful method in the field of molecular biology was the invention of "sequence logos"~\cite{schneider1990sequence}. Sequence logos provide a visual representation of transcription factor binding site (TFBS) preferences, allowing researchers to understand the binding preferences of transcription factors. A sequence logo consists of a stack of letters at each position (e.g., {A, C, G, T} for DNA sequences), where the height of each letter stack is proportional to the information content of the corresponding nucleotide distribution at that position~\cite{schneider1990sequence}. The widespread application of this method has demonstrated its utility in summarizing and visualizing binding sites, facilitating comparisons and communication of transcription factor binding preferences among researchers. In fact, sequence logo methods have been expanded in various ways, such as increasing the resolution of compositional enrichment/depletion (e.g., Seq2logo~\cite{Seq2Logo10.1093/nar/gks469} and EDlogo~\cite{Dey2018sequencelogo}), displaying higher-order sequence motifs~\cite{10.1093/nar/gky497}, or demonstrating relationships between binding site positions~\cite{Siebert2016Bayesian}.\\
-\indent Sequence logos help biologists understand the sequence preferences of transcription factors, but they cannot explain cell-type-specific selection of TFBS (transcription factor binding sites). Therefore, additional information that affects transcription, such as DNA methylation and CpG dinucleotides, is required to gain a more comprehensive understanding of TF (transcription factor) function and quantify gene regulation within cells. Here, we introduce MethylSeqLogo~\cite{Hsu2022.11.05.515271}, a software tool that display sequence logo with DNA methylation and CpG depletion as epigenetic information. Unfortunately, MethylSeqLogo only provides a limited set of pre-processed example files and does not allow researchers to input their own raw experimental data. Therefore, based on this idea, this study aims to provide computational pipelines for MethylSeqLogo, enabling researchers to utilize it extensively.
+DNA methylation refers to the addition of a methyl group to the fifth carbon atom of cytosine, resulting in the formation of methyl cytosine (meC). It is often classified as the fifth DNA base~\cite{Listerfifthbase2009}~\cite{Vinermethylsensitive2016} and is known to cause gene silencing and the abnormal functioning of genes, leading to inhibitory effects~\cite{Jones2012DNAmethylationislands}. DNA methylation is an epigenetic modification that can alter cellular gene function without changing the DNA sequence. Its effects can be inherited by the next generation. Numerous studies have shown a strong association between DNA methylation and cancer~\cite{KeithDNAmethyl2005}~\cite{Feinberg1983Hypomethylation}.
+
+A dinucleotide sequence may be considered too short and lack biological interest. However, CpG dinucleotides are an exception. In most vertebrate genomes, CpG dinucleotides are generally rare, occurring at a frequency of approximately one-fifth~\cite{Saxonov2006}. This is because they are prone to methylation by DNA methyltransferases. However, the situation is different in promoter regions. In many promoter regions, there is often a high density of consecutive CpG dinucleotides, forming gene sequences known as CpG islands. CpG islands are characterized by a relatively low or nearly absent level of methylation compared to the rest of the genome. This implies that genes within these regions are typically active and capable of transcription~\cite{Deaton2011CpG}.
+
+Given that transcription is a complex and crucial process, it is of great importance to enable researchers to analyze and compare data efficiently and clearly. One early successful method in the field of molecular biology was the invention of "sequence logos"~\cite{schneider1990sequence}. Sequence logos provide a visual representation of transcription factor binding site (TFBS) preferences, allowing researchers to understand the binding preferences of transcription factors. A sequence logo consists of a stack of letters at each position (e.g., {A, C, G, T} for DNA sequences), where the height of each letter stack is proportional to the information content of the corresponding nucleotide distribution at that position~\cite{schneider1990sequence}. The widespread application of this method has demonstrated its utility in summarizing and visualizing binding sites, facilitating comparisons and communication of transcription factor binding preferences among researchers. In fact, sequence logo methods have been expanded in various ways, such as increasing the resolution of compositional enrichment/depletion (e.g., Seq2logo~\cite{Seq2Logo10.1093/nar/gks469} and EDlogo~\cite{Dey2018sequencelogo}), displaying higher-order sequence motifs~\cite{10.1093/nar/gky497}, or demonstrating relationships between binding site positions~\cite{Siebert2016Bayesian}.
+
+Sequence logos help biologists understand the sequence preferences of transcription factors, but they cannot explain cell-type-specific selection of TFBS (transcription factor binding sites). Therefore, additional information that affects transcription, such as DNA methylation and CpG dinucleotides, is required to gain a more comprehensive understanding of TF (transcription factor) function and quantify gene regulation within cells. 
+
+Here, we introduce MethylSeqLogo~\cite{Hsu2022.11.05.515271}, a software tool that display sequence logo with DNA methylation and CpG depletion as epigenetic information. Unfortunately, MethylSeqLogo design appears useful to but their work has two limitations.The first limitation is that they did not fully automate the process of producing MethylSeqLogo images from primary data.This is problematic because both TF binding and DNA methylation are tissue specific, so every user potentially is interested in seeing a different MethylSeqLogo image. Therefore, based on this idea, this study aims to provide computational pipelines for MethylSeqLogo, enabling researchers to utilize it extensively.
 
 \section{Motivation \& Research objective}
 The binding of transcription factors to DNA is a crucial mechanism for controlling gene expression in cells. For instance, humans possess approximately 1600\textasciitilde1700 different transcription factors, and through dynamic interactions with DNA, these transcription factors enable precise regulation of cellular processes such as growth, development, and response to the environment. Therefore, visualizing the binding sites of transcription factors to quantify gene regulation within cells has consistently been an important and necessary topic in life science research~\cite{vaquerizas2009census}~\cite{liu2017transcriptional}.
 
-In a nutshell,this study explores the development of an automated computational pipeline for MethylSeqLogo~\cite{Hsu2022.11.05.515271} using tools and methods such as BEDTools~\cite{10.1093/bioinformatics/btq033}, Pandas~\cite{mckinney2010data}, seaborn~\cite{Waskom2021}, and others.The motivation behind this work stems from the observation that MethylSeqLogo currently only provides a limited set of pre-processed example files and and lacks the functionality to accept researchers' own experimental raw data to generate results(seqence logo).
+In a nutshell,this study explores the development of an automated computational pipeline for MethylSeqLogo~\cite{Hsu2022.11.05.515271} using tools and methods such as BEDTools~\cite{10.1093/bioinformatics/btq033}, Pandas~\cite{mckinney2010data}, seaborn~\cite{Waskom2021}, and others.The motivation behind this work stems from the observation that MethylSeqLogo currently only provides a limited set of pre-processed example files and and lacks the functionality to accept researcher's own experimental raw data to generate results(seqence logo).
 
-In addition to providing an automated computational pipeline, we propose a novel background model called the "flanking region." The background model is utilized to assess statistical differences associated with a set of binding sites, indicating the amount of relative entropy~\cite{kullback1951information} we can extract from the logos that produced by software .MethylSeqLogo currently provides the "whole-genome" and a set of predefined "promoter" regions as background models. However,this study further focuses on the establishment of background regions specific to individual transcription factor binding sites, thereby tailoring customized background models for each transcription factor. The approach involves considering a defined range (e.g., 100 bp) of regions surrounding each binding site. Ideally, this process is performed independently for each binding site, resulting in the inclusion of x binding sites near genomic positions x times in the background model statistics. This ensures that the statistical differences depicted in the MethylSeqLogo visualization primarily arise from the binding sites themselves or their adjacent bases, rather than being influenced by large-scale trends in methylation and/or CpG frequency across the whole-genome.\\
-Here, we aims to enable biologists to input their own experimental raw data, and then generate sequence logos with methylation information and CpG depletion. Moreover,We provide a novel background model option called "flanking regions." The objective is to facilitate efficient and comprehensive observation of gene regulation within cells, including the extent of methylation, thereby providing valuable insights for academic research, analysis, and scientific communication. Furthermore, this research has potential implications in disease prevention and treatment.
+In addition to providing an automated computational pipeline, we propose a novel background model called the "flanking region." The background model is utilized to assess statistical differences associated with a set of binding sites, indicating the amount of relative entropy~\cite{kullback1951information} we can extract from the logos that produced by software .MethylSeqLogo currently provides the "whole-genome" and a set of predefined "promoter" regions as background models. However,this study further focuses on the establishment of background regions specific to individual transcription factor binding sites, thereby tailoring customized background models for each transcription factor. The approach involves considering a defined range (e.g., 100 bp) of regions surrounding each binding site. Ideally, this process is performed independently for each binding site, resulting in the inclusion of x binding sites near genomic positions x times in the background model statistics. This ensures that the statistical differences depicted in the MethylSeqLogo visualization primarily arise from the binding sites themselves or their adjacent bases, rather than being influenced by large-scale trends in methylation and/or CpG frequency across the whole-genome.
+
+Here, we 1) create an automated pipeline to automate the production of MethylSeqLogo’s from experimental data in standard data file formats, and 2) extend the MethylSeqLogo software to support TF specific background models based on the regions flanking their binding sites. The objective is to facilitate efficient and comprehensive observation of gene regulation within cells, including the extent of methylation, thereby providing valuable insights for academic research, analysis, and scientific communication. Furthermore, this research has potential implications in disease prevention and treatment.
 \chapter{Related Work}
 In this chapter, we will first give an overview of MethylSeqLogo~\cite{Hsu2022.11.05.515271}, and then introduce pybedtools~\cite{10.1093/bioinformatics/btr539} and the data required for this study to visualize seqlogo of transcription factor binding sites and methylation information, which are supported and provided by various databases. The following subsections provide a detailed explanation.
 \section{MethylSeqLogo}
-MethylSeqLogo~\cite{Hsu2022.11.05.515271} is an innovative tool known as DNA methylation smart sequence logos. It was proposed by Fei-Man Hsu and Paul Horton in 2022 as a method to incorporate DNA methylation information into sequence representation, providing insights into transcription factor functionality and gene regulation in cellular contexts.
+MethylSeqLogo~\cite{Hsu2022.11.05.515271} is an innovative tool known as DNA methylation smart sequence logos. It was proposed by Hsu \& Horton in 2022 as a ”methylation smart” extension to sequence logos which simultaneously show the DNA sequence and methylation patterns of a collection of TF binding sites (visàvis some background distribution), providing insights into transcription factor functionality and gene regulation in cellular contexts.
 
 Building upon traditional sequence logos, MethylSeqLogo intuitively represents the sequence conservation and preferences at each position in the DNA sequence. However, it expands this representation by incorporating DNA methylation information and highlighting CpG dinucleotide depletion in additional tracks. This enables researchers to gain a comprehensive understanding of the interplay between DNA methylation, transcription factor functionality, and gene regulation.
-
-A detailed description of MethylSeqLogo shown in \ref{fig:F1}. The column height of each track in MethylSeqLogo is determined by calculating the relative entropy (unit:bits), which represents the statistical distribution difference between a set of binding site sequences and the background model. Relative entropy, also known as the Kullback-Leibler directed divergence~\cite{kullback1951information}, is equivalent to information content~\cite{Information1986} when a uniform distribution background is used. The formula from MethylSeqLogo shown in  equation \ref{eu_eqn}:
+A detailed description of MethylSeqLogo shown in Figure\ref{fig:F1}. The column height of each track in MethylSeqLogo is determined by calculating the relative entropy (unit:bits), which represents the statistical distribution difference between a set of binding site sequences and the background model. Relative entropy, also known as the Kullback-Leibler directed divergence~\cite{kullback1951information}, is equivalent to information content~\cite{Information1986} when a uniform distribution background is used. The formula from MethylSeqLogo shown in  equation \ref{eu_eqn}:
 \begin{equation} \label{eu_eqn}
 	\text{D}(M||B) \overset{\text{def}}{=} \text{ E }\left [ \text{lg}\left (\frac{P[s|\text{Motif model M}]}{P[s|\text{Background model B}]} \right) \right]
 \end{equation}
@@ -149,7 +194,7 @@ Transcription factor binding sites, also known as motifs, refer to specific DNA 
 \end{figure}
 
 \subsection{ReMap}
-If we are interested in identifying and predicting transcription factor binding sites in different cells or tissues, we can perform ChIP-seq experiments. In these experiments, we obtain numerous peaks, with each peak representing a potential transcription factor binding site within a specific region. Fortunately, ReMap~\cite{ReMapFayrouz2022} has organized this information for us. ReMap is a large-scale database of transcriptional regulatory peaks, which collects and analyzes data from ChIP-seq, ChIP-exo, and DAP-seq experiments. It covers various species, including humans, mice, fruit flies, and Arabidopsis, and provides analysis for a total of 1210 transcription factors. ReMap offers the data in both BED file and FASTA file formats, allowing users to download experiment-related information. For this study, we utilized the BED files containing ChIP-seq data from ReMap.
+If we are interested in identifying transcription factor binding sites in different cells or tissues, we can perform ChIP-seq experiments. ChIP-Seq is an experimental techinque which can measure the approximate positions of the binding sites of a given transcription factor to within ~100–250bp.The identification of the most probably site within that range is done computationally based on the known binding sequence preferences of the transcription factor. In these experiments, we obtain numerous peaks, with each peak representing a potential transcription factor binding site within a specific region. Fortunately, ReMap~\cite{ReMapFayrouz2022} has organized this information for us. ReMap is a large-scale database of transcriptional regulatory peaks, which collects and analyzes data from ChIP-seq, ChIP-exo, and DAP-seq experiments. It covers various species, including humans, mice, fruit flies, and Arabidopsis, and provides analysis for a total of 1210 transcription factors. ReMap offers the data in both BED file and FASTA file formats, allowing users to download experiment-related information. For this study, we utilized the BED files containing ChIP-seq data from ReMap.
 
 \begin{figure}[H]
 	\centering
@@ -197,7 +242,7 @@ Pipeline overview shown in \ref{fig:overview},The user is required to input file
 
 \section[automatic computational workflow]{Detail workflow of automatic computational pipeline}
 \subsection[Finding TFBSs]{Identifying the binding site information of TF in cell.}
-In this step, two input files are required. The first file contains the regions obtained from the Chip-seq experiment, which potentially contain the binding sites of MYC in human embryonic stem cells. These regions are represented as fuzzy genomic coordinates and typically have a range of 200-500 base pairs. This data can be obtained from ReMap, and the specific file I used is "ENCSR000EBY.MYC.WA01.bed". The second file can be obtained from JASPAR and contains the precise binding site coordinates of the MYC transcription factor across various cells or tissues. The file I used is "MA0147.3.bed". Both files obtained from ReMap and JASPAR are in the .bed file format. We can then intersect the genomic coordinates from these two files to find the binding site information of MYC in human embryonic stem cells(H1-hESC). In the automated computational pipeline, this study used the "intersect" function provided by the pybedtools library in BEDTools to perform this operation.A total of 2088 transcription factor binding sites of MYC were found.
+In this step, two input files are required. The first file contains the regions obtained from the Chip-seq experiment, which potentially contain the binding sites of MYC in human embryonic stem cells. These regions are represented as approximate genomic coordinates and typically have a range of 200-500 base pairs. This data can be obtained from ReMap, and the specific file I used is "ENCSR000EBY.MYC.WA01.bed". The second file can be obtained from JASPAR and contains the precise binding site coordinates of the MYC transcription factor across various cells or tissues. The file I used is "MA0147.3.bed". Both files obtained from ReMap and JASPAR are in the .bed file format. We can then intersect the genomic coordinates from these two files to find the binding site information of MYC in human embryonic stem cells(H1-hESC). In the automated computational pipeline, this study used the "intersect" function provided by the pybedtools library in BEDTools to perform this operation.A total of 2088 transcription factor binding sites of MYC were found.
 It is important to note that both files must be mapped to the same human reference genome. Genomic coordinates generated based on different human reference genomes can vary significantly. The commonly used human reference genomes are hg19 and hg38, with hg38 being more prevalent. This is because hg38 has improved genome coverage compared to hg19, resulting in more accurate positioning and annotation of gene sequences. Furthermore, some structural errors in chromosomes have been corrected in hg38. Fortunately, we can quickly convert the genomic coordinates between hg19 and hg38 using the "Lift Genome Annotations" website provided by UCSC.
 \begin{figure}[H]
 	\centering
@@ -350,7 +395,7 @@ In this chapter, we will discuss whether the content mentioned in the literature
 The transcription factor MYC belongs to the helix-loop-helix family and possesses characteristic structural features of a basic region and a leucine zipper. It is an important transcription factor that plays a crucial role in processes such as cell growth, metabolism, angiogenesis, and immune response. It is considered a significant oncogene, as its overexpression has been associated with abnormal cell proliferation in many tumors.According to the research conducted by Michael Allevato et al., the preferred sequence for the binding site of the MYC transcription factor is CANNTG, with the CACGTG sequence being the most highly favored and preferred~\cite{allevato2017sequence}.The visualization in~\ref{fig:MYC} demonstrates consistency with the reported findings.
 
 \begin{figure}[H]
-	\centering
+	\centering	
 	\includegraphics[scale=0.4]{figures/MYC.png}
 	\caption{Seqlogo of MYC in H1-hESC cell in whole-genome background model with Kullback-Liebler}
 	\label{fig:MYC} 
@@ -367,7 +412,8 @@ CEBPB is a transcription factor belonging to the C/EBP (CCAAT/enhancer-binding p
 
 \chapter{Discussion \& Future Work}
 \section{Discussion}
-In this study, the input data utilized a BED file containing specific binding site coordinates of transcription factors in all cells or tissues, which was curated by JASPAR. For each included transcription factor, JASPAR always provides a position weight matrix (PWM) but may not necessarily offer a corresponding BED file. Additionally, there may be multiple versions of the data (as detailed in the section 2.3.1), so special attention is required. In the case of the CEBPB transcription factor, this study encountered different versions of the data. The current version available is the 3rd version, which only provides a PWM matrix. The BED file, on the other hand, is only available in version 1. However, the data in versions 1 and 3 differ significantly(shown in Figure~\ref{fig:CEBPBv1v3}), leading to different results in the sequence logo analysis. In a research report, it was shown that the preferred binding sites of the CEBPB transcription factor is ATTGCGCAAT~\cite{johnson1993identification}. Figure~\ref{fig:CEBPBFlanking} presents the results obtained using version 1 (Figure~\ref{fig:CEBPBv1}) of the BED file. The common bases at positions 7 and 8 in motifs on the figure differ from the research findings of scholars Peter F.Johnso. At first glance, this might lead us to believe that there is an error in the computational pipeline established in this study. However, upon observing the Sequence logo provided by JASPAR in version 3, it becomes evident that the disparities arise from differences in the content of the JASPAR versions. Details like these are worth paying close attention to.
+\subsection{JASPAR version affects Sequence Logo Track of MethylSeqLogo}
+In this study, the input data utilized a BED file containing specific binding site coordinates of transcription factors in all cells or tissues, which was curated by JASPAR. For each included transcription factor, JASPAR always provides a position weight matrix (PWM) but may not necessarily offer a corresponding BED file. Additionally, there may be multiple versions of the data (as detailed in the section 2.3.1), so special attention is required. In the case of the CEBPB transcription factor, this study encountered different versions of the data. The current version available is the 3rd version, which only provides a PWM matrix. The BED file, on the other hand, is only available in version 1. However, the data in versions 1 and 3 differ significantly(shown in Figure~\ref{fig:CEBPBv1v3}), leading to different results in the sequence logo analysis. In a research report, it was shown that the preferred binding sites of the CEBPB transcription factor is ATTGCGCAAT~\cite{johnson1993identification}. Figure~\ref{fig:CEBPBFlanking} presents the results obtained using version 1 (Figure~\ref{fig:CEBPBv1}) of the BED file. The common bases at positions 7 and 8 in motifs on the figure differ from the research findings of~\cite{johnson1993identification}. At first glance, this might lead us to believe that there is an error in the computational pipeline established in this study. However, upon observing the Sequence logo provided by JASPAR in version 3, it becomes evident that the disparities arise from differences in the content of the JASPAR versions. Details like these are worth paying close attention to.
 \begin{figure}[H]
 	\centering
 	\begin{subfigure}[b]{0.45\textwidth}
@@ -382,32 +428,38 @@ In this study, the input data utilized a BED file containing specific binding si
 	\caption{Sequence logo of different versions of CEBPB in JASPAR (without no change)}
 	\label{fig:CEBPBv1v3} 
 \end{figure}
-
-In Figure~\ref{fig:CEBPBFlanking}, we used the flanking region background model to illustrate the high methylation status of the binding sites of the CEBPB transcription factor in human embryonic stem cells. Now, we have switched to using the whole-genome as the background model for statistical distribution calculations. The results, as shown in Figure~\ref{fig:CEBPBWhole-genome}, reveal that the visualization of high methylation status under the whole-genome background model is not as prominent as when using the flanking region background model. Therefore, choosing an appropriate background model is crucial depending on the purpose of our observation. In this case of examining the high methylation status of CEBPB binding sites in human embryonic stem cells, the flanking region would be a preferable choice.
+\subsection{Compare 3 Background Models}
+In Figure~\ref{fig:CEBPBFlanking}, we used the flanking region background model to illustrate the high methylation status of the binding sites of the CEBPB transcription factor in human embryonic stem cells. Now, we have switched to using the whole-genome and promotor region as the background model for statistical distribution calculations. The results, as shown in Figure~\ref{fig:CEBPBWhole-genome} and Figure~\ref{fig:CEBPBpromotor}, reveal that the visualization of high methylation status under the whole-genome background model is not as prominent as when using the flanking region background model. Interestingly, under the promoter region background model, low methylation is shown. Therefore, choosing an appropriate background model is crucial depending on the purpose of our observation. In this case of examining the high methylation status of CEBPB binding sites in human embryonic stem cells, the flanking region would be a preferable choice.
 \begin{figure}[H]
 	\centering
-	\begin{subfigure}[b]{0.46\textwidth}
+	\begin{subfigure}[b]{0.85\textwidth}
+		\includegraphics[width=\textwidth]{figures/yulingCEBPB_human_H1-hESC_whole_genome_Methyl_Kullback-Liebler_seqlogo.png}
+		\caption{Whole-genome}
+		\label{fig:CEBPBWhole-genome} 
+	\end{subfigure}
+	\begin{subfigure}[b]{0.85\textwidth}
+		\includegraphics[width=\textwidth]{figures/CEBPBPROMOTOR.png}
+		\caption{Promotor region}
+		\label{fig:CEBPBpromotor} 
+	\end{subfigure}
+	\begin{subfigure}[b]{0.85\textwidth}
 		\includegraphics[width=\textwidth]{figures/yulingCEBPB_human_H1-hESC_1000_Methyl_Kullback-Liebler_seqlogo.png}
 		\caption{Flanking region}
 		\label{fig:CEBPBFlanking region} 
 	\end{subfigure}
-	\begin{subfigure}[b]{0.48\textwidth}
-		\includegraphics[width=\textwidth]{figures/CEBPBWG.png}
-		\caption{Whole-genome}
-		\label{fig:CEBPBWhole-genome} 
-	\end{subfigure}
-	\caption{MethylSeqLogo of CEBPB transcription factor in H1-hESC cell with different background models}
+	\caption{MethylSeqLogo of CEBPB TF in H1-hESC cell with different background models}
 	\label{fig:CEBPBregion} 
 \end{figure}
+\subsection{More efficient}
 Lastly, I would like to discuss the establishment of an automated computational pipeline in this study. The design of automation not only brings convenience but, more importantly, allows for the rapid generation of results. Prior to the implementation of the automated computational pipeline, it was estimated that it would take approximately 3-4 hours to obtain a single MethylSeqLogo depicting the binding of MYC to human embryonic stem cells using the whole-genome background model. However, with the implementation of the automated computational pipeline, this study can now generate approximately 10 MethylSeqLogos depicting the binding of various transcription factors to human embryonic stem cells in the whole-genome background model within the same timeframe.
 \begin{figure}[H]
 	\centering
-	\begin{subfigure}[b]{0.48\textwidth}
+	\begin{subfigure}[b]{0.9\textwidth}
 		\includegraphics[width=\textwidth]{figures/yulingMYC_human_H1-hESC_whole_genome_Methyl_Kullback-Liebler_seqlogo copy.png}
 		\caption{MYC in H1-hESC cell}
 		\label{fig:MYCH1-hESC} 
 	\end{subfigure}
-	\begin{subfigure}[b]{0.48\textwidth}
+	\begin{subfigure}[b]{1\textwidth}
 		\includegraphics[width=\textwidth]{figures/10.png}
 		\caption{10 TF in H1-hESC cell}
 		\label{fig:10TF} 
@@ -423,7 +475,7 @@ In this paper, we establishes an automated computational pipeline for MethylSeqL
 The experimental results of this study, as presented in the visualized charts, are consistent with findings reported by multiple researchers. In future studies, researchers utilizing the automated computational pipeline established in this study can efficiently and clearly observe gene regulation within cells, such as the extent of methylation occurrence and binding site preferences. This can contribute to academic research, related analyses, and discussions, and even aid in disease prevention and treatment.
 \newpage
 \AddToContents{Bibliography}
-\printbibliography
+%\printbibliography
 
 
 \end{document}
