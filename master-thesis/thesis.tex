@@ -75,7 +75,20 @@ After describing our implementation we show several MethylSeqLogo images generat
 	在描述我們的方法的實做之後，我們展示了使用我們的管道生成的幾個MethylSeqLogo圖像。當使用相同的（全基因組）背景模型時，我們確認這些MethylSeqLogo圖像與Hsu和Horton發佈的圖像一致。此外，我們對比了使用與啟動子區域背景（promoter region）相比的側翼區域（flanking region）背景模型生成的MethylSeqLogo圖像。我們發現在某些情況下，使用啟動子背景模型（promoter region）似乎表明DNA甲基化起著重要作用，當使用側翼區域背景模型（flanking region）時，DNA甲基化與結合位之間的大部分相關性消失。這個觀察強調了在解釋數據中的統計趨勢時使用適當背景的必要性。
 }
 
-\newcommand*\Acknowledgements{%
+\newcommand*\Acknowledgements{首先，我由衷感謝我的指導教授賀保羅老師。感謝您對我的指導和鼓勵，您專業知識和寶貴建議在整個研究過程中給予了我巨大的幫助，也豐富了我在生物基因領域方面的知識，在研究討論的過程中，讓我能更快速的找到研究問題解決的方向，再來也非常感謝劉宗霖老師與許釗凱老師，兩位口委老師給了我很多論文上的建議與教誨，使我的研究更加豐富且有深度。本研究的完成同時還要感謝 MethylSeqLogo 的主要作者之一 Fei-Man Hsu，與我分享研究時的寶貴經驗。
+
+接者我要感謝實驗室的所有夥伴，學長姐-威穎、芊瑀、力元、宥霖以及恆霖；同屆夥伴-筱萱、怡靜、海墨、中柏、育丞以及益宗；學弟妹-映慈、其亮以及育晨，我們彼此教學相長，感謝你們提供課業及研究上的寶貴討論與協助，有你們的陪伴為我的研究所生活增添許多歡笑與色彩。
+
+最後，我要感謝我最摯愛的爸爸、媽媽以及家人朋友們，感謝他們在我研究生涯的每一個階段給予我的無私支持和理解，你們的鼓勵和愛是我不斷前進的力量。再次感謝每一位給予我協助與鼓勵的人，您們的支持和幫助是我順利完成這項研究的關鍵。我將永遠珍惜這段寶貴的經歷。
+\begin{flushleft}
+謹向您們致以最誠摯的謝意，祝福您們身體健康、萬事如意。
+\end{flushleft}
+
+\begin{flushleft}
+此致 \\
+郭昱伶	
+\end{flushleft}
+
 
 }
 
@@ -94,7 +107,7 @@ After describing our implementation we show several MethylSeqLogo images generat
 % \nomenclature[Z]{Myc}{MYC proto-oncogene}
 % \nomenclature[Z]{USF-1}{Upstream stimulatory factor 1}
 
-\nomenclature[Z]{meC}{Methylcytosine}
+\nomenclature[Z]{meC}{Methyl-Cytosine}
 \nomenclature[Z]{TF}{Transcription Factor}
 \nomenclature[Z]{bp}{Base Pair}
 \nomenclature[Z]{DNA}{Deoxyribonucleic Acid}
@@ -108,7 +121,7 @@ After describing our implementation we show several MethylSeqLogo images generat
 
 \newpage
 \setcounter{page}{1}
-ifth DNA\pagenumbering{arabic}
+\pagenumbering{arabic}
 
 
 \chapter{Introduction}
